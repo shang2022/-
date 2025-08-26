@@ -1,18 +1,20 @@
 # Firkraag Hot Plate Firmware
 
+![](/photos/0.jpg)
 ![](/photos/1.jpg)
 ![](/photos/2.jpg)
+![](/photos/qq.jpg)
 
 QQ：1058528742
 
-![](/photos/1.jpg)
-![](/photos/2.jpg)
-
-QQ：1058528742
+【Intrduction】 https://www.bilibili.com/video/BV1eBtQzxENt
+【Tutorial】 https://www.bilibili.com/video/BV1q1YfzaEyw
 
 ## Hardware Solution
 
 Open Source Hardware Address: [https://oshwhub.com/elisaday/high-color-value-low-cost-reflow](https://oshwhub.com/elisaday/high-color-value-low-cost-reflow)
+
+Case：https://gf.jlcfa.com/machine-detail/477643941673639939
 
 - **Main Controller:** STC8H1K08, with a back button and an EC11 encoder for operation.
 - **Temperature Sensing:** PT1000 thermistor.

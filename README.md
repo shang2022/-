@@ -2,14 +2,21 @@
 
 # 红龙加热台固件
 
+![](/photos/0.jpg)
 ![](/photos/1.jpg)
 ![](/photos/2.jpg)
+![](/photos/qq.jpg)
 
 QQ 交流群：1058528742
+
+【功能介绍】 https://www.bilibili.com/video/BV1eBtQzxENt
+【复刻教学】 https://www.bilibili.com/video/BV1q1YfzaEyw
 
 ## 硬件方案
 
 硬件开源地址：https://oshwhub.com/elisaday/high-color-value-low-cost-reflow
+
+铝合金外壳：https://gf.jlcfa.com/machine-detail/477643941673639939
 
 - 主控 STC8H1K08，返回按钮外加 EC11 旋转编码器的操作方式
 - 温度采样使用 PT1000 热敏电阻
