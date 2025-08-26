@@ -23,8 +23,6 @@ static __CODE uint16_t PT1000_TEMP_TABLE[] = {
 
 static volatile int8_t _do_pid = 0;
 
-struct PID_CFG g_pid_cfg;
-
 // 输出限制
 #define PWM_MIN 0
 #define PWM_MAX 10000
@@ -40,14 +38,14 @@ void calc_pwm(void) {
     int32_t error = g_target_temp - g_current_temp;
 
     int32_t change_rate = g_current_temp - _last_measure;
-    int32_t pred_measure = g_current_temp + change_rate * g_pid_cfg.delay;
+    int32_t pred_measure = g_current_temp + change_rate * g_config.delay;
     int32_t pred_error = g_target_temp - pred_measure;
 
-    int32_t p_term = g_pid_cfg.kp * pred_error;
+    int32_t p_term = g_config.kp * pred_error;
 
     int32_t i_term = _integral;
     if (_last_output > PWM_MIN && _last_output < PWM_MAX) {
-        i_term += g_pid_cfg.ki * error;
+        i_term += g_config.ki * error;
 
         if (i_term > PWM_MAX)
             i_term = PWM_MAX;
@@ -56,7 +54,7 @@ void calc_pwm(void) {
     }
     _integral = i_term;
 
-    int32_t d_term = -g_pid_cfg.kd * change_rate;
+    int32_t d_term = -g_config.kd * change_rate;
 
     int32_t pwm = p_term + i_term + d_term;
 

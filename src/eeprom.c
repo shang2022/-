@@ -1,3 +1,4 @@
+#include "app.h"
 #include "eeprom.h"
 #include "fw_hal.h"
 #include "heat.h"
@@ -30,13 +31,13 @@ void EEPROM_init(void) {
     IAP_CONTR = 0x80;
 
     EEPROM_read(REFLOW_CFG_ADDR, (uint8_t *)&g_reflow_cfg, sizeof(g_reflow_cfg));
-    EEPROM_read(PID_CFG_ADDR, (uint8_t *)&g_pid_cfg, sizeof(g_pid_cfg));
+    EEPROM_read(PID_CFG_ADDR, (uint8_t *)&g_config, sizeof(g_config));
 }
 
 void EEPROM_save_cfg(void) {
     erase(REFLOW_CFG_ADDR);
     write(REFLOW_CFG_ADDR, (uint8_t *)&g_reflow_cfg, sizeof(g_reflow_cfg));
-    write(PID_CFG_ADDR, (uint8_t *)&g_pid_cfg, sizeof(g_pid_cfg));
+    write(PID_CFG_ADDR, (uint8_t *)&g_config, sizeof(g_config));
 }
 
 void EEPROM_read(uint16_t addr, uint8_t *data, uint8_t size) {

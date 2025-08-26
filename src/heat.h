@@ -22,12 +22,5 @@ int8_t HEAT_is_back_pressed(void);
 extern int16_t g_target_temp;
 extern int16_t g_current_temp;
 
-struct PID_CFG {
-    int16_t kp;
-    int16_t ki;
-    int16_t kd;
-    int16_t delay;
-};
-extern struct PID_CFG g_pid_cfg;
 
 #endif

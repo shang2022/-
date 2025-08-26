@@ -61,13 +61,14 @@ void main(void) {
     gpio_setup();
 
     SFRX_ON();
+    EEPROM_init();
+
     LCD_init();
     LCD_clear(WHITE);
 
     ADC_init();
     HEAT_init();
     EC11_init();
-    EEPROM_init();
     SET_init();
 
     // EXTI_Global_SetIntState(HAL_State_ON);

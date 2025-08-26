@@ -1,4 +1,5 @@
 #include "lcd.h"
+#include "app.h"
 #include "eeprom.h"
 #include "font.h"
 #include "fw_hal.h"
@@ -64,25 +65,25 @@ void setWindow(uint8_t sx, uint8_t sy, uint8_t width, uint8_t height) {
     ey = sy + height - 1;
 
 #if LCD_DIR == LCD_DIR_0
-    sx = sx + 26;
-    ex = ex + 26;
-    sy = sy + 1;
-    ey = ey + 1;
+    sx = sx + (uint16_t)g_config.x_offset;
+    ex = ex + (uint16_t)g_config.x_offset;
+    sy = sy + (uint16_t)g_config.y_offset;
+    ey = ey + (uint16_t)g_config.y_offset;
 #elif LCD_DIR == LCD_DIR_180
-    sx = sx + 26;
-    ex = ex + 26;
-    sy = sy + 1;
-    ey = ey + 1;
+    sx = sx + (uint16_t)g_config.x_offset;
+    ex = ex + (uint16_t)g_config.x_offset;
+    sy = sy + (uint16_t)g_config.y_offset;
+    ey = ey + (uint16_t)g_config.y_offset;
 #elif LCD_DIR == LCD_DIR_270
-    sx = sx + 1;
-    ex = ex + 1;
-    sy = sy + 26;
-    ey = ey + 26;
+    sx = sx + (uint16_t)g_config.x_offset;
+    ex = ex + (uint16_t)g_config.x_offset;
+    sy = sy + (uint16_t)g_config.y_offset;
+    ey = ey + (uint16_t)g_config.y_offset;
 #elif LCD_DIR == LCD_DIR_90
-    sx = sx + 1;
-    ex = ex + 1;
-    sy = sy + 26;
-    ey = ey + 26;
+    sx = sx + (uint16_t)g_config.x_offset;
+    ex = ex + (uint16_t)g_config.x_offset;
+    sy = sy + (uint16_t)g_config.y_offset;
+    ey = ey + (uint16_t)g_config.y_offset;
 #endif
 
     LCD_WR_REG(CMD_SET_X);
@@ -229,12 +230,16 @@ void LCD_init(void) {
     LCD_WR_DATA((uint8_t)((1 << 3) | (1 << 7) | (0 << 6) | (1 << 5)));
 #endif
 
-#if COLOR_INVERSION == 1
-    LCD_WR_REG(0x21); // Display inversion
-#else
-    LCD_WR_REG(0x20); // Display non-inversion
-#endif
+    LCD_update_color_inv();
     LCD_WR_REG(0x29); // Display on
+}
+
+void LCD_update_color_inv(void) {
+    if (g_config.color_inv) {
+        LCD_WR_REG(0x21); // Display inversion
+    } else {
+        LCD_WR_REG(0x20); // Display non-inversion
+    }
 }
 
 void LCD_clear(uint8_t color) { LCD_fill(0, 0, LCD_WIDTH, LCD_HEIGHT, color); }
@@ -279,20 +284,17 @@ void LCD_show_font_char(uint8_t x, uint8_t y, const uint8_t *font, uint8_t bytes
 
 void LCD_show_number(uint8_t x, uint8_t y, uint16_t number, uint8_t width, uint8_t color) {
     x = x + DIGIT_WIDTH * (width - 1);
-    if (number == 0) {
-        EEPROM_read(FONT_DIGIT_ADDR, font_bmp, DIGIT_BYTES);
-        LCD_show_font_char(x, y, font_bmp, DIGIT_BYTES, color);
-        return;
-    }
+    uint16_t v = number;
     while (width > 0) {
         uint8_t digit = number % 10;
         number /= 10;
 
-        if (number == 0 && digit == 0) {
+        if (number == 0 && digit == 0 && v != 0) {
             LCD_fill(x, y, DIGIT_WIDTH, FONT_HEIGHT, BLACK);
         } else {
             EEPROM_read(FONT_DIGIT_ADDR + digit * DIGIT_BYTES, font_bmp, DIGIT_BYTES);
             LCD_show_font_char(x, y, font_bmp, DIGIT_BYTES, color);
+            v = 1;
         }
         width--;
         x -= DIGIT_WIDTH;

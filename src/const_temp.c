@@ -13,7 +13,7 @@ static int8_t _working = 0;
 void CONST_TEMP_enter(void) {
     _working = 0;
 
-    EC11_set_range(30, 0, 256, 0);
+    EC11_set_range(30, 0, 300, 0);
 
     LCD_clear(BLACK);
 

@@ -1,4 +1,5 @@
 #include "ec11.h"
+#include "app.h"
 #include "fw_hal.h"
 
 // 编码器计数值
@@ -15,11 +16,7 @@ void EC11_init(void) {
 }
 
 void EC11_roll_isr(void) {
-#if EC11_DIR == 0
-    if ((P_ENC_A ^ P_ENC_B) == 1) {
-#else
-    if ((P_ENC_A ^ P_ENC_B) == 0) {
-#endif
+    if ((P_ENC_A ^ P_ENC_B) == g_config.ec11_dir) {
         if (g_ec11_value > encoder_value_min) {
             g_ec11_value--;
         } else if (encoder_value_loop) {

@@ -43,6 +43,7 @@
 #define BLUE_GRAY 14
 
 void LCD_init(void);
+void LCD_update_color_inv(void);
 void LCD_clear(uint8_t color);
 void LCD_fill(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
 void LCD_show_font_char(uint8_t x, uint8_t y, const uint8_t *font, uint8_t bytes, uint8_t color);
