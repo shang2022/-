@@ -20,6 +20,8 @@ struct CONFIGURE {
     int8_t delay;
     int8_t x_offset;
     int8_t y_offset;
+    int8_t temp_adj_low;
+    int8_t temp_adj_high;
     int8_t ec11_dir;
     int8_t color_inv;
 };

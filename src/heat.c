@@ -6,6 +6,9 @@
 #include "lcd.h"
 #include "menu.h"
 
+#define TEMP_ADJ_START 50
+#define TEMP_ADJ_RANGE 150
+
 // 单位: 0.1°C
 int16_t g_target_temp = 300;
 int16_t g_current_temp = 300;
@@ -123,6 +126,10 @@ void HEAT_read_temp(void) {
             }
         }
     }
+
+    int16_t high = g_config.temp_adj_high - 30;
+    int16_t low = g_config.temp_adj_low - 30;
+    g_current_temp += ((high - low) * (g_current_temp / 10 - TEMP_ADJ_START) / TEMP_ADJ_RANGE + low) * 10;
 }
 
 void HEAT_reset(void) {

@@ -12,9 +12,9 @@
 
 #define COLOR_WHITE RGB565(255, 255, 255)
 #define COLOR_BLACK RGB565(0, 0, 0)
-#define COLOR_BLUE RGB565(0x34, 0x6d, 0xf1)
+#define COLOR_BLUE RGB565(0, 0, 255)
 #define COLOR_GREEN RGB565(0, 255, 0)
-#define COLOR_RED RGB565(255, 60, 60)
+#define COLOR_RED RGB565(255, 0, 0)
 #define COLOR_GRAY RGB565(0x00, 0xff, 0x00)
 
 #define FONT_HEIGHT 26
@@ -173,41 +173,41 @@ void LCD_init(void) {
     LCD_WR_REG(0xC5); // VCOM
     LCD_WR_DATA(0x3A);
 
-    LCD_WR_REG(0xE0); // positive gamma
-    LCD_WR_DATA(0x10);
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x05);
-    LCD_WR_DATA(0x0D);
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x06);
-    LCD_WR_DATA(0x03);
-    LCD_WR_DATA(0x07);
-    LCD_WR_DATA(0x0A);
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x1D);
-    LCD_WR_DATA(0x32);
-    LCD_WR_DATA(0x03);
-    LCD_WR_DATA(0x0B);
-    LCD_WR_DATA(0x00);
-    LCD_WR_DATA(0x2F);
+    // LCD_WR_REG(0xE0); // positive gamma
+    // LCD_WR_DATA(0x10);
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x05);
+    // LCD_WR_DATA(0x0D);
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x06);
+    // LCD_WR_DATA(0x03);
+    // LCD_WR_DATA(0x07);
+    // LCD_WR_DATA(0x0A);
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x1D);
+    // LCD_WR_DATA(0x32);
+    // LCD_WR_DATA(0x03);
+    // LCD_WR_DATA(0x0B);
+    // LCD_WR_DATA(0x00);
+    // LCD_WR_DATA(0x2F);
 
-    LCD_WR_REG(0xE1); // negative gamma
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x12);
-    LCD_WR_DATA(0x05);
-    LCD_WR_DATA(0x07);
-    LCD_WR_DATA(0x0C);
-    LCD_WR_DATA(0x05);
-    LCD_WR_DATA(0x02);
-    LCD_WR_DATA(0x06);
-    LCD_WR_DATA(0x07);
-    LCD_WR_DATA(0x0B);
-    LCD_WR_DATA(0x13);
-    LCD_WR_DATA(0x2C);
-    LCD_WR_DATA(0x03);
-    LCD_WR_DATA(0x0D);
-    LCD_WR_DATA(0x02);
-    LCD_WR_DATA(0x1F);
+    // LCD_WR_REG(0xE1); // negative gamma
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x12);
+    // LCD_WR_DATA(0x05);
+    // LCD_WR_DATA(0x07);
+    // LCD_WR_DATA(0x0C);
+    // LCD_WR_DATA(0x05);
+    // LCD_WR_DATA(0x02);
+    // LCD_WR_DATA(0x06);
+    // LCD_WR_DATA(0x07);
+    // LCD_WR_DATA(0x0B);
+    // LCD_WR_DATA(0x13);
+    // LCD_WR_DATA(0x2C);
+    // LCD_WR_DATA(0x03);
+    // LCD_WR_DATA(0x0D);
+    // LCD_WR_DATA(0x02);
+    // LCD_WR_DATA(0x1F);
 
     LCD_WR_REG(0x3A);
     LCD_WR_DATA(0x05);
@@ -235,11 +235,12 @@ void LCD_init(void) {
 }
 
 void LCD_update_color_inv(void) {
-    if (g_config.color_inv) {
-        LCD_WR_REG(0x21); // Display inversion
-    } else {
-        LCD_WR_REG(0x20); // Display non-inversion
-    }
+    LCD_WR_REG(g_config.color_inv ? 0x21 : 0x20); // Display inversion
+    // if (g_config.color_inv) {
+    //     LCD_WR_REG(0x21); // Display inversion
+    // } else {
+    //     LCD_WR_REG(0x20); // Display non-inversion
+    // }
 }
 
 void LCD_clear(uint8_t color) { LCD_fill(0, 0, LCD_WIDTH, LCD_HEIGHT, color); }
@@ -282,7 +283,8 @@ void LCD_show_font_char(uint8_t x, uint8_t y, const uint8_t *font, uint8_t bytes
     }
 }
 
-void LCD_show_number(uint8_t x, uint8_t y, uint16_t number, uint8_t width, uint8_t color) {
+void LCD_show_number(uint8_t x, uint8_t y, int16_t n, uint8_t width, uint8_t color) {
+    uint16_t number = (uint16_t)(n >= 0 ? n : -n);
     x = x + DIGIT_WIDTH * (width - 1);
     uint16_t v = number;
     while (width > 0) {
@@ -290,8 +292,14 @@ void LCD_show_number(uint8_t x, uint8_t y, uint16_t number, uint8_t width, uint8
         number /= 10;
 
         if (number == 0 && digit == 0 && v != 0) {
+            if (n < 0 && v == 1) {
+                digit = 10; // '-'
+                n = 0;
+                goto __draw;
+            }
             LCD_fill(x, y, DIGIT_WIDTH, FONT_HEIGHT, BLACK);
         } else {
+        __draw:
             EEPROM_read(FONT_DIGIT_ADDR + digit * DIGIT_BYTES, font_bmp, DIGIT_BYTES);
             LCD_show_font_char(x, y, font_bmp, DIGIT_BYTES, color);
             v = 1;
@@ -305,15 +313,11 @@ void LCD_show_chinese(uint8_t x, uint8_t y, const uint8_t text_idx, uint8_t coun
     for (uint8_t i = 0; i < count; i++) {
         uint8_t idx = TEXT_IDX_ADDR[text_idx + i];
 
-        if (idx == 0xff) {
-            LCD_fill(x, y, CHINESE_WIDTH, FONT_HEIGHT, BLACK);
-        } else {
-            EEPROM_read(FONT_CHINESE_ADDR + idx * CHINESE_BYTES, font_bmp, 52);
-            LCD_show_font_char(x, y, font_bmp, 52, color);
+        EEPROM_read(FONT_CHINESE_ADDR + idx * CHINESE_BYTES, font_bmp, 52);
+        LCD_show_font_char(x, y, font_bmp, 52, color);
 
-            EEPROM_read(FONT_CHINESE_ADDR + idx * CHINESE_BYTES + 52, font_bmp, 33);
-            LCD_show_font_char(x + 16, y, font_bmp, 33, color);
-        }
+        EEPROM_read(FONT_CHINESE_ADDR + idx * CHINESE_BYTES + 52, font_bmp, 33);
+        LCD_show_font_char(x + 16, y, font_bmp, 33, color);
 
         x += CHINESE_WIDTH;
     }
