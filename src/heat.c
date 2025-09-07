@@ -117,10 +117,10 @@ void HEAT_read_temp(void) {
     } else if (PT1000 >= 21205) {
         g_current_temp = 3000;
     } else {
-        for (uint8_t i = 0; i < sizeof(PT1000_TEMP_TABLE) / sizeof(uint16_t) + 1; i++) {
+        for (uint8_t i = 0; i < sizeof(PT1000_TEMP_TABLE) / sizeof(uint16_t) - 1; i++) {
             uint32_t t1 = PT1000_TEMP_TABLE[i];
             uint32_t t2 = PT1000_TEMP_TABLE[i + 1];
-            if (t1 < PT1000 && PT1000 < t2) {
+            if (t1 <= PT1000 && PT1000 < t2) {
                 g_current_temp = i * 100 + (PT1000 - t1) * 100 / (t2 - t1);
                 break;
             }
