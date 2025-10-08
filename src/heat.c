@@ -152,7 +152,7 @@ void HEAT_run(void) {
     } else {
         P_HEAT_PWM = 0;
 
-        if (g_current_temp > g_target_temp + 30) {
+        if (g_current_temp > g_target_temp + 60) {
             P_FAN = 1;
         } else {
             P_FAN = 0;

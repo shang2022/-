@@ -22,5 +22,4 @@ int8_t HEAT_is_back_pressed(void);
 extern int16_t g_target_temp;
 extern int16_t g_current_temp;
 
-
 #endif
