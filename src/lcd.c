@@ -208,7 +208,7 @@ void LCD_fill(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color
     SPI_CS = 1;
 }
 
-void LCD_show_font_char(uint8_t x, uint8_t y, const uint8_t *font, uint8_t bytes, uint8_t color) {
+void LCD_show_font_char(const uint8_t *font, uint8_t bytes, uint8_t color) {
     for (uint8_t b = 0; b < bytes; b++) {
         uint8_t c = font[b];
         for (uint8_t i = 0; i < 8; i++) {
@@ -245,7 +245,7 @@ void LCD_show_number(uint8_t x, uint8_t y, int16_t n, uint8_t width, uint8_t col
             writeRAMPrepare();
             SPI_DC = 1;
             SPI_CS = 0;
-            LCD_show_font_char(x, y, font_bmp, DIGIT_BYTES, color);
+            LCD_show_font_char(font_bmp, DIGIT_BYTES, color);
             SPI_CS = 1;
 
             v = 1;
@@ -265,10 +265,10 @@ void LCD_show_chinese(uint8_t x, uint8_t y, const uint8_t text_idx, uint8_t coun
         uint8_t idx = TEXT_IDX_ADDR[text_idx + i];
 
         EEPROM_read(FONT_CHINESE_ADDR + idx * CHINESE_BYTES, font_bmp, 52);
-        LCD_show_font_char(x, y, font_bmp, 52, color);
+        LCD_show_font_char(font_bmp, 52, color);
 
         EEPROM_read(FONT_CHINESE_ADDR + idx * CHINESE_BYTES + 52, font_bmp, 33);
-        LCD_show_font_char(x + 16, y, font_bmp, 33, color);
+        LCD_show_font_char(font_bmp, 33, color);
 
         x += CHINESE_WIDTH;
         SPI_CS = 1;
