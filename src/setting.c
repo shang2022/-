@@ -45,7 +45,7 @@ void SET_enter(void) {
     _select_idx = 0;
 
     EC11_set_range(0, MIN_SETTING_IDX, MAX_SETTING_IDX, 1);
-    LCD_clear(BLACK);
+    LCD_clear();
     show_setting();
     show_value();
 }
@@ -78,7 +78,7 @@ void SET_run(void) {
 
             // X/Y偏移
             if (_select_idx == SCREEN_X_OFFSET_IDX || _select_idx == SCREEN_Y_OFFSET_IDX) {
-                LCD_clear(BLACK);
+                LCD_clear();
                 show_setting();
                 LCD_fill(0, 25, 8, 30, GREEN);
             }

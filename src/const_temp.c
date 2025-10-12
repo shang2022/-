@@ -15,7 +15,7 @@ void CONST_TEMP_enter(void) {
 
     EC11_set_range(30, 0, 300, 0);
 
-    LCD_clear(BLACK);
+    LCD_clear();
 
     LCD_show_chinese(20, 5, 3, 2, WHITE);
     LCD_show_chinese(126, 5, 0, 1, WHITE);

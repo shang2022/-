@@ -63,7 +63,7 @@ void REFLOW_enter(void) {
 
     EC11_set_range(0, 0, 4, 1);
 
-    LCD_clear(BLACK);
+    LCD_clear();
     show_setting_select();
     show_setting_title();
     show_setting_value();
@@ -147,7 +147,7 @@ void REFLOW_run(void) {
                     g_target_temp = g_current_temp;
                     _stage = 0;
 
-                    LCD_clear(BLACK);
+                    LCD_clear();
                     show_stage();
                     show_stage_value();
                 }
@@ -155,16 +155,18 @@ void REFLOW_run(void) {
         }
     } else {
         if (HEAT_is_back_pressed()) {
-            _working = 0;
-            HEAT_reset();
-            P_FAN = 0;
+            goto __stop;
         } else {
             HEAT_read_temp();
             show_stage_value();
 
             if (_stage == 3) {
-                P_HEAT_PWM = 0;
-                P_FAN = 1;
+                if (g_current_temp <= 500) {
+                    goto __stop;
+                } else {
+                    P_HEAT_PWM = 0;
+                    P_FAN = 1;
+                }
             } else {
                 if (_stage < 2) {
                     HEAT_run();
@@ -191,8 +193,15 @@ void REFLOW_run(void) {
     }
 
     return;
+__stop:
+    _working = 0;
+    P_FAN = 0;
+    goto __heat_reset;
+
 __main_menu:
-    HEAT_reset();
     g_app_stage = STAGE_MENU;
     MENU_enter();
+
+__heat_reset:
+    HEAT_reset();
 }

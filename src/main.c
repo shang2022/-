@@ -64,7 +64,7 @@ void main(void) {
     EEPROM_init();
 
     LCD_init();
-    LCD_clear(WHITE);
+    LCD_clear();
 
     ADC_init();
     HEAT_init();

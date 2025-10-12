@@ -19,7 +19,7 @@ static void show(void) {
 void MENU_enter(void) {
     EC11_set_range(0, 0, 2, 1);
 
-    LCD_clear(BLACK);
+    LCD_clear();
 
     show();
     for (uint8_t i = 0; i < 3; ++i) {

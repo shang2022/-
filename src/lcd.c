@@ -59,53 +59,22 @@ static void LCD_WR_DATA(uint8_t data) {
 // 开始写GRAM
 static void writeRAMPrepare(void) { LCD_WR_REG(CMD_WR_RAM); }
 
-void setWindow(uint8_t sx, uint8_t sy, uint8_t width, uint8_t height) {
-    uint16_t ex, ey;
-    ex = sx + width - 1;
-    ey = sy + height - 1;
-
-#if LCD_DIR == LCD_DIR_0
-    sx = sx + (uint16_t)g_config.x_offset;
-    ex = ex + (uint16_t)g_config.x_offset;
-    sy = sy + (uint16_t)g_config.y_offset;
-    ey = ey + (uint16_t)g_config.y_offset;
-#elif LCD_DIR == LCD_DIR_180
-    sx = sx + (uint16_t)g_config.x_offset;
-    ex = ex + (uint16_t)g_config.x_offset;
-    sy = sy + (uint16_t)g_config.y_offset;
-    ey = ey + (uint16_t)g_config.y_offset;
-#elif LCD_DIR == LCD_DIR_270
-    sx = sx + (uint16_t)g_config.x_offset;
-    ex = ex + (uint16_t)g_config.x_offset;
-    sy = sy + (uint16_t)g_config.y_offset;
-    ey = ey + (uint16_t)g_config.y_offset;
-#elif LCD_DIR == LCD_DIR_90
-    sx = sx + (uint16_t)g_config.x_offset;
-    ex = ex + (uint16_t)g_config.x_offset;
-    sy = sy + (uint16_t)g_config.y_offset;
-    ey = ey + (uint16_t)g_config.y_offset;
-#endif
-
+void setWindow(uint8_t x_start, uint8_t y_start, uint8_t width, uint8_t height) {
     LCD_WR_REG(CMD_SET_X);
     LCD_WR_DATA(0);
-    LCD_WR_DATA(sx);
+    LCD_WR_DATA(y_start + g_config.y_offset);
     LCD_WR_DATA(0);
-    LCD_WR_DATA(ex);
+    LCD_WR_DATA(y_start + height - 1 + g_config.y_offset);
     LCD_WR_REG(CMD_SET_Y);
     LCD_WR_DATA(0);
-    LCD_WR_DATA(sy);
+    LCD_WR_DATA(x_start + g_config.x_offset);
     LCD_WR_DATA(0);
-    LCD_WR_DATA(ey);
+    LCD_WR_DATA(x_start + width - 1 + g_config.x_offset);
 }
 
-static void drawPoint(uint8_t x, uint8_t y, uint16_t color) {
-    setWindow(x, y, 1, 1);
-    writeRAMPrepare();
-    SPI_DC = 1;
-    SPI_CS = 0;
+static void drawPoint(uint16_t color) {
     writeBus(color >> 8);
     writeBus(color & 0xFF);
-    SPI_CS = 1;
 }
 
 // 初始化lcd
@@ -212,23 +181,9 @@ void LCD_init(void) {
     LCD_WR_REG(0x3A);
     LCD_WR_DATA(0x05);
 
-#if LCD_DIR == LCD_DIR_0
     // 0度旋转
     LCD_WR_REG(0x36);
-    LCD_WR_DATA((uint8_t)((1 << 3) | (1 << 7) | (1 << 6) | (0 << 5)));
-#elif LCD_DIR == LCD_DIR_180
-    // 180度旋转
-    LCD_WR_REG(0x36);
-    LCD_WR_DATA((uint8_t)((1 << 3) | (0 << 7) | (0 << 6) | (0 << 5)));
-#elif LCD_DIR == LCD_DIR_270
-    // 270度旋转
-    LCD_WR_REG(0x36);
-    LCD_WR_DATA((uint8_t)((1 << 3) | (0 << 7) | (1 << 6) | (1 << 5)));
-#else
-    // 90度旋转
-    LCD_WR_REG(0x36);
-    LCD_WR_DATA((uint8_t)((1 << 3) | (1 << 7) | (0 << 6) | (1 << 5)));
-#endif
+    LCD_WR_DATA((uint8_t)((1 << 3) | (1 << 7) | (0 << 6) | (0 << 5)));
 
     LCD_update_color_inv();
     LCD_WR_REG(0x29); // Display on
@@ -236,49 +191,33 @@ void LCD_init(void) {
 
 void LCD_update_color_inv(void) {
     LCD_WR_REG(g_config.color_inv ? 0x21 : 0x20); // Display inversion
-    // if (g_config.color_inv) {
-    //     LCD_WR_REG(0x21); // Display inversion
-    // } else {
-    //     LCD_WR_REG(0x20); // Display non-inversion
-    // }
 }
 
-void LCD_clear(uint8_t color) { LCD_fill(0, 0, LCD_WIDTH, LCD_HEIGHT, color); }
+void LCD_clear(void) { LCD_fill(0, 0, LCD_WIDTH, LCD_HEIGHT, BLACK); }
 
 void LCD_fill(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color) {
     setWindow(x, y, width, height);
     writeRAMPrepare();
     SPI_DC = 1;
     SPI_CS = 0;
-    for (uint8_t x = 0; x < LCD_WIDTH; ++x) {
-        for (uint8_t y = 0; y < LCD_HEIGHT; ++y) {
-            writeBus(COLOR_MAP[color] >> 8);
-            writeBus(COLOR_MAP[color] & 0xFF);
+    for (uint8_t x = 0; x < width; ++x) {
+        for (uint8_t y = 0; y < height; ++y) {
+            drawPoint(COLOR_MAP[color]);
         }
     }
     SPI_CS = 1;
 }
 
 void LCD_show_font_char(uint8_t x, uint8_t y, const uint8_t *font, uint8_t bytes, uint8_t color) {
-    uint8_t y0 = y;
     for (uint8_t b = 0; b < bytes; b++) {
         uint8_t c = font[b];
         for (uint8_t i = 0; i < 8; i++) {
-            if ((y - y0) >= FONT_HEIGHT) {
-                x++;
-                if (x >= LCD_WIDTH) {
-                    return;
-                }
-                y = y0;
-            }
-
             if (c & 0x80) {
-                drawPoint(x, y, COLOR_MAP[color > 10 ? color - 10 : color]);
+                drawPoint(COLOR_MAP[color > 10 ? color - 10 : color]);
             } else {
-                drawPoint(x, y, color >= 10 ? COLOR_GRAY : COLOR_BLACK);
+                drawPoint(color >= 10 ? COLOR_GRAY : COLOR_BLACK);
             }
             c <<= 1;
-            y++;
         }
     }
 }
@@ -301,7 +240,14 @@ void LCD_show_number(uint8_t x, uint8_t y, int16_t n, uint8_t width, uint8_t col
         } else {
         __draw:
             EEPROM_read(FONT_DIGIT_ADDR + digit * DIGIT_BYTES, font_bmp, DIGIT_BYTES);
+
+            setWindow(x, y, CHINESE_WIDTH, FONT_HEIGHT);
+            writeRAMPrepare();
+            SPI_DC = 1;
+            SPI_CS = 0;
             LCD_show_font_char(x, y, font_bmp, DIGIT_BYTES, color);
+            SPI_CS = 1;
+
             v = 1;
         }
         width--;
@@ -311,6 +257,11 @@ void LCD_show_number(uint8_t x, uint8_t y, int16_t n, uint8_t width, uint8_t col
 
 void LCD_show_chinese(uint8_t x, uint8_t y, const uint8_t text_idx, uint8_t count, uint8_t color) {
     for (uint8_t i = 0; i < count; i++) {
+        setWindow(x, y, CHINESE_WIDTH, FONT_HEIGHT);
+        writeRAMPrepare();
+        SPI_DC = 1;
+        SPI_CS = 0;
+
         uint8_t idx = TEXT_IDX_ADDR[text_idx + i];
 
         EEPROM_read(FONT_CHINESE_ADDR + idx * CHINESE_BYTES, font_bmp, 52);
@@ -320,5 +271,6 @@ void LCD_show_chinese(uint8_t x, uint8_t y, const uint8_t text_idx, uint8_t coun
         LCD_show_font_char(x + 16, y, font_bmp, 33, color);
 
         x += CHINESE_WIDTH;
+        SPI_CS = 1;
     }
 }
