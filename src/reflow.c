@@ -28,8 +28,8 @@ static void show_setting_title(void) {
     LCD_show_chinese(20, 5, 1 + 2 * s, 2, WHITE);
     LCD_show_chinese(126, 5, 0, 1, WHITE);
 
-    LCD_show_chinese(20, 45, 11, 2, s < 2 ? WHITE : BLACK);
-    LCD_show_chinese(126, 45, 13, 1, s < 2 ? WHITE : BLACK);
+    LCD_show_chinese(20, 45, 11, 2, s < 3 ? WHITE : BLACK);
+    LCD_show_chinese(126, 45, 13, 1, s < 3 ? WHITE : BLACK);
 }
 
 static void show_setting_value(void) {
@@ -61,7 +61,7 @@ void REFLOW_enter(void) {
     _starting_time = 0;
     _stage = 0;
 
-    EC11_set_range(0, 0, 4, 1);
+    EC11_set_range(0, 0, 6, 1);
 
     LCD_clear();
     show_setting_select();
@@ -125,7 +125,7 @@ void REFLOW_run(void) {
             } else if (EC11_is_button_pressed()) {
                 _setting = 0;
                 EEPROM_save_cfg();
-                EC11_set_range(_select_idx, 0, 4, 1);
+                EC11_set_range(_select_idx, 0, 6, 1);
                 show_setting_select();
                 show_setting_value();
             }
@@ -161,25 +161,19 @@ void REFLOW_run(void) {
             show_stage_value();
 
             if (_stage == 3) {
-                if (g_current_temp <= 500) {
+                if (g_current_temp <= g_reflow_cfg.stages[3].target_temp * 10) {
                     goto __stop;
                 } else {
                     P_HEAT_PWM = 0;
                     P_FAN = 1;
                 }
             } else {
-                if (_stage < 2) {
-                    HEAT_run();
-                }
+                HEAT_run();
 
                 if (g_sec_elapsed) {
                     int16_t target_temp = g_reflow_cfg.stages[_stage].target_temp;
-                    if (_stage == 2) {
-                        P_HEAT_PWM = 1;
-                    } else {
-                        if (g_target_temp < target_temp * 10) {
-                            g_target_temp += g_reflow_cfg.stages[_stage].speed;
-                        }
+                    if (g_target_temp < target_temp * 10) {
+                        g_target_temp += g_reflow_cfg.stages[_stage].speed;
                     }
                 }
 
