@@ -36,7 +36,7 @@ static void show_setting_value(void) {
     uint8_t s = _select_idx / 2;
 
     LCD_show_number(75, 5, g_reflow_cfg.stages[s].target_temp, 3, WHITE);
-    LCD_show_number(75, 45, g_reflow_cfg.stages[s].time, 3, s < 2 ? WHITE : BLACK);
+    LCD_show_number(75, 45, g_reflow_cfg.stages[s].time, 3, s < 3 ? WHITE : BLACK);
 }
 
 static void show_stage(void) {
@@ -158,7 +158,6 @@ void REFLOW_run(void) {
             goto __stop;
         } else {
             HEAT_read_temp();
-            show_stage_value();
 
             if (_stage == 3) {
                 if (g_current_temp <= g_reflow_cfg.stages[3].target_temp * 10) {
@@ -171,16 +170,18 @@ void REFLOW_run(void) {
                 HEAT_run();
 
                 if (g_sec_elapsed) {
-                    int16_t target_temp = g_reflow_cfg.stages[_stage].target_temp;
-                    if (g_target_temp < target_temp * 10) {
+                    show_stage_value();
+
+                    int16_t target_temp = g_reflow_cfg.stages[_stage].target_temp * 10;
+                    if (g_target_temp < target_temp) {
                         g_target_temp += g_reflow_cfg.stages[_stage].speed;
                     }
-                }
 
-                if (g_current_temp >= g_reflow_cfg.stages[_stage].target_temp * 10) {
-                    g_target_temp = g_current_temp;
-                    _stage++;
-                    show_stage();
+                    if (g_current_temp >= target_temp) {
+                        g_target_temp = g_current_temp;
+                        _stage++;
+                        show_stage();
+                    }
                 }
             }
         }
