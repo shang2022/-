@@ -5,4 +5,5 @@
 .vscode/ipch
 
 .vscode/
-eeprom.bin
+eeprom*.bin
+firmware*.hex
