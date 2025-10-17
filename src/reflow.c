@@ -159,6 +159,10 @@ void REFLOW_run(void) {
         } else {
             HEAT_read_temp();
 
+            if (g_sec_elapsed) {
+                show_stage_value();
+            }
+
             if (_stage == 3) {
                 if (g_current_temp <= g_reflow_cfg.stages[3].target_temp * 10) {
                     goto __stop;
@@ -170,8 +174,6 @@ void REFLOW_run(void) {
                 HEAT_run();
 
                 if (g_sec_elapsed) {
-                    show_stage_value();
-
                     int16_t target_temp = g_reflow_cfg.stages[_stage].target_temp * 10;
                     if (g_target_temp < target_temp) {
                         g_target_temp += g_reflow_cfg.stages[_stage].speed;
