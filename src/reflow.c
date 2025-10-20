@@ -193,6 +193,7 @@ void REFLOW_run(void) {
 __stop:
     _working = 0;
     P_FAN = 0;
+    REFLOW_enter();
     goto __heat_reset;
 
 __main_menu:
