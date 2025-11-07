@@ -37,11 +37,13 @@ void CONST_TEMP_run(void) {
     uint16_t v = g_ec11_value * 10;
     if (g_target_temp != v) {
         g_target_temp = v;
+        g_config.const_temp = v;
         LCD_show_number(75, 5, g_ec11_value, 3, WHITE);
     }
 
     if (EC11_is_button_pressed()) {
         _working = 1;
+        EEPROM_save_cfg();
         LCD_fill(0, 0, 8, LCD_HEIGHT, GREEN);
     } else if (HEAT_is_back_pressed()) {
         HEAT_reset();

@@ -85,6 +85,7 @@ PID_CFG = {
         1, 26, # x_offset, y_offset
         30, 30, # temp_adj_high, temp_adj_low
         1, 1, # ec11_dir, color_inv
+        30, # const temp
     ]
 }
 
