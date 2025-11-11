@@ -142,41 +142,41 @@ void LCD_init(void) {
     LCD_WR_REG(0xC5); // VCOM
     LCD_WR_DATA(0x3A);
 
-    LCD_WR_REG(0xE0); // positive gamma
-    LCD_WR_DATA(0x10);
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x05);
-    LCD_WR_DATA(0x0D);
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x06);
-    LCD_WR_DATA(0x03);
-    LCD_WR_DATA(0x07);
-    LCD_WR_DATA(0x0A);
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x1D);
-    LCD_WR_DATA(0x32);
-    LCD_WR_DATA(0x03);
-    LCD_WR_DATA(0x0B);
-    LCD_WR_DATA(0x00);
-    LCD_WR_DATA(0x2F);
+    // LCD_WR_REG(0xE0); // positive gamma
+    // LCD_WR_DATA(0x10);
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x05);
+    // LCD_WR_DATA(0x0D);
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x06);
+    // LCD_WR_DATA(0x03);
+    // LCD_WR_DATA(0x07);
+    // LCD_WR_DATA(0x0A);
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x1D);
+    // LCD_WR_DATA(0x32);
+    // LCD_WR_DATA(0x03);
+    // LCD_WR_DATA(0x0B);
+    // LCD_WR_DATA(0x00);
+    // LCD_WR_DATA(0x2F);
 
-    LCD_WR_REG(0xE1); // negative gamma
-    LCD_WR_DATA(0x0E);
-    LCD_WR_DATA(0x12);
-    LCD_WR_DATA(0x05);
-    LCD_WR_DATA(0x07);
-    LCD_WR_DATA(0x0C);
-    LCD_WR_DATA(0x05);
-    LCD_WR_DATA(0x02);
-    LCD_WR_DATA(0x06);
-    LCD_WR_DATA(0x07);
-    LCD_WR_DATA(0x0B);
-    LCD_WR_DATA(0x13);
-    LCD_WR_DATA(0x2C);
-    LCD_WR_DATA(0x03);
-    LCD_WR_DATA(0x0D);
-    LCD_WR_DATA(0x02);
-    LCD_WR_DATA(0x1F);
+    // LCD_WR_REG(0xE1); // negative gamma
+    // LCD_WR_DATA(0x0E);
+    // LCD_WR_DATA(0x12);
+    // LCD_WR_DATA(0x05);
+    // LCD_WR_DATA(0x07);
+    // LCD_WR_DATA(0x0C);
+    // LCD_WR_DATA(0x05);
+    // LCD_WR_DATA(0x02);
+    // LCD_WR_DATA(0x06);
+    // LCD_WR_DATA(0x07);
+    // LCD_WR_DATA(0x0B);
+    // LCD_WR_DATA(0x13);
+    // LCD_WR_DATA(0x2C);
+    // LCD_WR_DATA(0x03);
+    // LCD_WR_DATA(0x0D);
+    // LCD_WR_DATA(0x02);
+    // LCD_WR_DATA(0x1F);
 
     LCD_WR_REG(0x3A);
     LCD_WR_DATA(0x05);

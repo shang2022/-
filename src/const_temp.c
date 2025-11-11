@@ -13,8 +13,6 @@ static int8_t _working = 0;
 void CONST_TEMP_enter(void) {
     _working = 0;
 
-    EC11_set_range(30, 0, 300, 0);
-
     LCD_clear();
 
     LCD_show_chinese(20, 5, 3, 2, WHITE);
@@ -23,7 +21,10 @@ void CONST_TEMP_enter(void) {
     LCD_show_chinese(20, 45, 9, 2, WHITE);
     LCD_show_chinese(126, 45, 0, 1, WHITE);
 
-    LCD_show_number(75, 5, g_target_temp / 10, 3, WHITE);
+    g_target_temp = g_config.const_temp * 10;
+
+    EC11_set_range(g_config.const_temp, 0, 300, 0);
+    LCD_show_number(75, 5, g_config.const_temp, 3, WHITE);
     LCD_show_number(75, 45, g_current_temp / 10, 3, WHITE);
 }
 
@@ -37,12 +38,12 @@ void CONST_TEMP_run(void) {
     uint16_t v = g_ec11_value * 10;
     if (g_target_temp != v) {
         g_target_temp = v;
-        g_config.const_temp = v;
         LCD_show_number(75, 5, g_ec11_value, 3, WHITE);
     }
 
     if (EC11_is_button_pressed()) {
         _working = 1;
+        g_config.const_temp = g_target_temp / 10;
         EEPROM_save_cfg();
         LCD_fill(0, 0, 8, LCD_HEIGHT, GREEN);
     } else if (HEAT_is_back_pressed()) {
