@@ -24,7 +24,7 @@ struct CONFIGURE {
     int8_t temp_adj_high;
     int8_t ec11_dir;
     int8_t color_inv;
-    int8_t const_temp;
+    int16_t const_temp;
 };
 extern struct CONFIGURE g_config;
 
